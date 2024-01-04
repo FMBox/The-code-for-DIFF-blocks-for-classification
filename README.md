@@ -6,41 +6,35 @@ This repository provides the Pytorch implementation for the paper: Deep Integrat
 
 The source code was running with the following environment.
 
-* Python 3.8
-* Pytorch 1.10.0
-* numpy???
-* matplotlib????
-* os
+* Python3.8
+* Pytorch1.10.0
+* torchvision
+* torchaudio
+* matplotlib
+* time
 
 ### Data preparation
 
 Please download  the following datasets.
 
-* S??? (http:xxxxx)
-* C
-* H
+* SIPaKMeD (https://www.cs.uoi.gr/~marina/sipakmed.html)
+* CRIC (https://database.cric.com.br/)
+* Herlev (https://mde-lab.aegean.gr/index.php/downloads/)
+* BCCD (https://www.kaggle.com/paultimothymooney/blood-cells)
 
 ### How to train the model
 
-Please run the following .
+Please run as the follows.
 
-* "model.py" 
-
-* ""
-
-* ""
-
-  ---------------or-----------
-
-### model.py
+#### model.py
 
 The proposed model with DIFF blocks.
 
-### utils.py
+#### utils.py
 
 The dataset settings.
 
-### main.py
+#### main.py
 
-The training of the proposed model.
+The training for the proposed model.
 

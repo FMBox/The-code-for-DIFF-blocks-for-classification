@@ -104,7 +104,6 @@ def default_conv_3x3(in_channels, out_channels, kernel_size, stride, padding, gr
 
 
 
-
 '''2. Transformer Branch: global'''
 # A block: MHSA & MLP
 
@@ -157,7 +156,7 @@ class FeedForward(nn.Module):
     def forward(self, x):
         return self.net(x)
 
-# Layer Normalization to embeddings before MHSA/FFN: improve training stability
+# Layer Normalization to embeddings
 class PreNorm(nn.Module):
     def __init__(self, dim, fn):
         super().__init__()
@@ -193,7 +192,7 @@ class FB(nn.Module):
             if i == 0:
                 modules_body.append(act)
          
-        self.body = nn.Sequential(*modules_body)   # 2 conv layers + BatchNorm
+        self.body = nn.Sequential(*modules_body)   
 
     def forward(self, x):
         res = self.body(x)
@@ -247,7 +246,6 @@ class ConTrans(nn.Module):
             nn.MaxPool2d(kernel_size=3, stride=1, padding=1),      
         )
 
-
         '''Parallel CNN & Trans'''
         
         '''CNN Branch'''
@@ -256,8 +254,6 @@ class ConTrans(nn.Module):
                 ConvBlock(inplanes=n_feats, outplanes=n_feats, res_conv=True, stride=1),
             ) for _ in range(n_resgroups)
         ])
-
-
 
         '''Transformer Branch''' 
         # Trans Block: MHSA & MLP 
@@ -275,7 +271,6 @@ class ConTrans(nn.Module):
                 ),
             ]) for _ in range(n_layers // 2)
         ])
-
         
         '''DIFF: Feature Fusion Block'''
         # each DIFF: 2 FB
@@ -329,9 +324,9 @@ class ConTrans(nn.Module):
 
 
             '''DIFF Block'''
-            f = torch.cat((x, x_tkn), 1)        # Concat 
+            f = torch.cat((x, x_tkn), 1)       
             
-            f = f + self.fusion_block[i](f)        # DIFF units
+            f = f + self.fusion_block[i](f)        
             
             # a conv -> feed to CNN & Trans
             if i != (self.n_fusionblocks - 1):
@@ -345,11 +340,9 @@ class ConTrans(nn.Module):
             
             
         # final fusion
-        x = self.conv_last(f)     # a conv
+        x = self.conv_last(f)     
         x = x + identity
 
-        
-        '''Classification layer: FC'''
         x = self.avgpool(x)
         x = x.view(x.size(0), -1)
         x = self.fc(x)

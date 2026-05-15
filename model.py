@@ -80,7 +80,6 @@ class ConvBlock(nn.Module):
 
         x += residual
         x = self.act3(x)
-
        
         return x
 
@@ -106,8 +105,6 @@ def default_conv_3x3(in_channels, out_channels, kernel_size, stride, padding, gr
 
 '''2. Transformer Branch: global'''
 # A block: MHSA & MLP
-
-# MHSA
 # Compute attention & combine
 class SelfAttention(nn.Module):
     def __init__(self, dim, heads=6, dim_head=64, dropout=0.0):
@@ -138,10 +135,6 @@ class SelfAttention(nn.Module):
 
         return self.to_out(out)
 
-
-
-
-# MLP 
 class FeedForward(nn.Module):
     def __init__(self, dim, mlp_dim, dropout=0.0):
         super().__init__()
@@ -209,7 +202,6 @@ class ConTrans(nn.Module):
         super(ConTrans, self).__init__()
 
         conv = default_conv
-
         task = 'sr'
         n_feats = 64
         n_resgroups = 4          
@@ -221,7 +213,6 @@ class ConTrans(nn.Module):
         n_fusionblocks = 4         
         token_size = 3
         expansion_ratio = 4
-
         scale = 1
         rgb_range = 255
         n_colors = 3
@@ -231,11 +222,9 @@ class ConTrans(nn.Module):
         self.token_size = token_size
         self.n_fusionblocks = n_fusionblocks
         self.embedding_dim = embedding_dim = n_feats * (token_size ** 2)     
-
         flatten_dim = embedding_dim
         hidden_dim = embedding_dim * expansion_ratio
         dim_head = embedding_dim // n_heads
-
 
         '''Stem module'''
         self.out_channels = out_channels = min(n_feats, int(n_feats * 2))
@@ -256,7 +245,7 @@ class ConTrans(nn.Module):
         ])
 
         '''Transformer Branch''' 
-        # Trans Block: MHSA & MLP 
+        # Trans Block
         self.linear_encoding = nn.Linear(flatten_dim, embedding_dim)
 
         self.mhsa_block = nn.ModuleList([
@@ -273,7 +262,7 @@ class ConTrans(nn.Module):
         ])
         
         '''DIFF: Feature Fusion Block'''
-        # each DIFF: 2 FB
+        # each DIFF
         self.fusion_block = nn.ModuleList([
             nn.Sequential(
                 FB(conv, n_feats * 2, 1, act=nn.ReLU(True), norm_layer=nn.BatchNorm2d(n_feats * 2)),
@@ -302,8 +291,7 @@ class ConTrans(nn.Module):
         identity = x
 
         '''Parallel CNN & Trans'''
-        
-        '''Trans Branch: embeddings -> MHSA, MLP -> ...'''
+        '''Trans Branch'''
         # Convert feat into embed
         x_tkn = F.unfold(x, self.token_size, stride=self.token_size)     
         x_tkn = rearrange(x_tkn, 'b d t -> b t d')     
@@ -311,10 +299,10 @@ class ConTrans(nn.Module):
 
         # MHSA & MLP
         for i in range(self.n_fusionblocks):
-            x_tkn = self.mhsa_block[i][0](x_tkn) + x_tkn            # Transformer features
+            x_tkn = self.mhsa_block[i][0](x_tkn) + x_tkn           
             x_tkn = self.mhsa_block[i][1](x_tkn) + x_tkn
 
-            x = self.cnn_branch[i](x)           # CNN features 
+            x = self.cnn_branch[i](x)            
 
             x_tkn_res, x_res = x_tkn, x   
 
@@ -325,19 +313,14 @@ class ConTrans(nn.Module):
 
             '''DIFF Block'''
             f = torch.cat((x, x_tkn), 1)       
-            
             f = f + self.fusion_block[i](f)        
-            
-            # a conv -> feed to CNN & Trans
             if i != (self.n_fusionblocks - 1):
                 x_temp = self.conv_temp(f)
-                x = x_temp                 # CNN 
-                x_tkn = x_temp             # Trans 
+                x = x_temp                
+                x_tkn = x_temp              
 
                 x_tkn = F.unfold(x_tkn, self.token_size, stride=self.token_size)
-                x_tkn = rearrange(x_tkn, 'b d t -> b t d')
-            
-            
+                x_tkn = rearrange(x_tkn, 'b d t -> b t d')  
             
         # final fusion
         x = self.conv_last(f)     

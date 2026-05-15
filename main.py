@@ -21,8 +21,8 @@ import torch.optim
 import torch.multiprocessing as mp
 import torch.utils.data
 import torch.utils.data.distributed
-from step2_utils import get_train_dataset, get_default_val_loader, get_default_train_sampler_loader, log_msg
-from step1_model import get_CNNTrans_func_by_name
+from utils import get_train_dataset, get_default_val_loader, get_default_train_sampler_loader, log_msg
+from model import get_CNNTrans_func_by_name
 
 
 

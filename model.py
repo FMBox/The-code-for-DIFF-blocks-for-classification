@@ -25,17 +25,17 @@ class ConvBlock(nn.Module):
         conv_3x3 = default_conv_3x3
 
 
-        # 1x1 conv: shrink channel dimensions 
+        # 1x1 conv
         self.conv1 = conv_1x1(in_channels=med_planes, out_channels=med_planes, kernel_size=1, stride=1, padding=0, bias=False)
         self.bn1 = norm_layer(med_planes)
         self.act1 = act_layer(inplace=True)
 
-        # 3x3 conv: extract local spatial features 
+        # 3x3 conv
         self.conv2 = conv_3x3(in_channels=med_planes, out_channels=med_planes, kernel_size=3, stride=1, padding=1, groups=1, bias=False)
         self.bn2 = norm_layer(med_planes)
         self.act2 = act_layer(inplace=True)
 
-        # 1x1 conv: restore channels 
+        # 1x1 conv
         self.conv3 = conv_1x1(in_channels=med_planes, out_channels=med_planes, kernel_size=1, stride=1, padding=0, bias=False)
         self.bn3 = norm_layer(outplanes)
         self.act3 = act_layer(inplace=True)

@@ -124,8 +124,6 @@ training_loss, valid_loss = [], []
 Train_acc_list, valid_acc_list = [],[]
 
 
-
-
 # training
 # Each epoch: train model (compute -> update)
 def train(train_loader, model, criterion, optimizer, epoch, args):
@@ -178,12 +176,6 @@ def train(train_loader, model, criterion, optimizer, epoch, args):
 
 
     return acc / len(train_loader.dataset) * 100., loss.item()
-
-
-
-
-
-
 
 
 

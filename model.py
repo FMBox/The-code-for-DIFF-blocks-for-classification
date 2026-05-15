@@ -105,10 +105,6 @@ def default_conv_3x3(in_channels, out_channels, kernel_size, stride, padding, gr
 
 
 
-
-
-
-
 '''2. Transformer Branch: global'''
 # A block: MHSA & MLP
 
@@ -184,8 +180,6 @@ class PreNorm2(nn.Module):
 
 
 
-
-
 '''3. DIFF block - Feature Fusion units'''
 class FB(nn.Module):
     def __init__(self, conv, n_feat, kernel_size, bias=False, act=nn.ReLU(True), norm_layer=partial(nn.BatchNorm2d, eps=1e-6)):
@@ -205,9 +199,6 @@ class FB(nn.Module):
         res = self.body(x)
         res += x
         return res
-
-
-
 
 
 
@@ -364,8 +355,6 @@ class ConTrans(nn.Module):
         x = self.fc(x)
 
         return x
-
-
 
 
 

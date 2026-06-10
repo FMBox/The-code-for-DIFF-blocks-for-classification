@@ -27,8 +27,7 @@ from model import get_CNNTrans_func_by_name
 
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-print(device)
-Herlev_TRAINSET_SIZE = 733        
+print(device)        
 
 parser = argparse.ArgumentParser(description='PyTorch Image Training')
 parser.add_argument('-a', '--arch', metavar='ARCH', default='CNNTrans0', help='model structure')
